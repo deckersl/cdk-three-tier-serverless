@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { NoteType } from '../fns/notesTable';
 import { getNotes, saveNote } from './utils';
 
-// Best practice would be to break this component down and maybe do a bit more with state management.
 const App = () => {
   const [body, setBody] = useState('');
   const [notes, setNotes] = useState([]);
@@ -23,54 +22,65 @@ const App = () => {
         subject,
         type: 'note',
       });
-      const n = await getNotes();
-      setNotes(n);
+      setNotes(await getNotes());
     }
   };
 
   return (
-    <div>
-      <div>
-        <div>
+    <>
+      <div className="app">
+        <h1>📝 Serverless Notes</h1>
+        <p className="subtitle">Three-tier serverless app — API Gateway · Lambda · DynamoDB</p>
+
+        <div className="form">
           <input
             onChange={(e) => setSubject(e.target.value)}
-            placeholder="Note Subject"
+            placeholder="Subject"
             type="text"
             value={subject}
           />
-        </div>
-        <div>
           <textarea
             onChange={(e) => setBody(e.target.value)}
-            placeholder="Note Body"
+            placeholder="Write a note…"
             value={body}
-          ></textarea>
+            rows={3}
+          />
+          <button onClick={clickHandler}>Save Note</button>
         </div>
-        <div>
-          <button onClick={clickHandler}>save</button>
-        </div>
-      </div>
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th>Subject</th>
-              <th>Note</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {notes.map((note: NoteType) => (
-              <tr key={note.date}>
-                <td>{note.subject}</td>
-                <td>{note.note}</td>
-                <td>{new Date(note.date).toLocaleString()}</td>
+
+        {notes.length === 0 ? (
+          <p className="empty">No notes yet — create one above.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Subject</th>
+                <th>Note</th>
+                <th>Date</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {notes.map((note: NoteType) => (
+                <tr key={note.date}>
+                  <td>{note.subject}</td>
+                  <td>{note.note}</td>
+                  <td>{new Date(note.date).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
-    </div>
+
+      <footer>
+        <span>React 17.0.2</span><span className="sep">·</span>
+        <span>CDK 2.100.0</span><span className="sep">·</span>
+        <span>Vite 2.7.7</span><span className="sep">·</span>
+        <span>TypeScript 3.9</span><span className="sep">·</span>
+        <span>OneTable 2.2.0</span><span className="sep">·</span>
+        <span>Node 18</span>
+      </footer>
+    </>
   );
 };
 

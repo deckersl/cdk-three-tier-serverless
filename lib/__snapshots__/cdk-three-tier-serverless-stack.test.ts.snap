@@ -35,7 +35,7 @@ Object {
             "Arn",
           ],
         },
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs18.x",
         "Timeout": 120,
       },
       "Type": "AWS::Lambda::Function",
@@ -190,6 +190,11 @@ Object {
       ],
       "Properties": Object {
         "Code": Any<Object>,
+        "Environment": Object {
+          "Variables": Object {
+            "AWS_CA_BUNDLE": "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem",
+          },
+        },
         "Handler": "index.handler",
         "Layers": Array [
           Object {
@@ -202,7 +207,7 @@ Object {
             "Arn",
           ],
         },
-        "Runtime": "python3.7",
+        "Runtime": "python3.9",
         "Timeout": 900,
       },
       "Type": "AWS::Lambda::Function",
@@ -313,6 +318,10 @@ Object {
                 "s3:List*",
                 "s3:DeleteObject*",
                 "s3:PutObject",
+                "s3:PutObjectLegalHold",
+                "s3:PutObjectRetention",
+                "s3:PutObjectTagging",
+                "s3:PutObjectVersionTagging",
                 "s3:Abort*",
               ],
               "Effect": "Allow",
@@ -377,7 +386,7 @@ Object {
             ],
           ],
         },
-        "Handler": "__entrypoint__.handler",
+        "Handler": "index.handler",
         "MemorySize": 128,
         "Role": Object {
           "Fn::GetAtt": Array [
@@ -385,7 +394,7 @@ Object {
             "Arn",
           ],
         },
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs18.x",
         "Timeout": 900,
       },
       "Type": "AWS::Lambda::Function",
@@ -418,7 +427,7 @@ Object {
           "S3Bucket": Object {
             "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": "e9882ab123687399f934da0d45effe675ecc8ce13b40cb946f3e1d6141fe8d68.zip",
+          "S3Key": "599fe1d2b58c97a9aae174c5fa0e6dbc2f0a6ff432e519bf275c25007d92c5fe.zip",
         },
         "Description": "/opt/awscli/aws",
       },
@@ -508,7 +517,8 @@ Object {
             "Arn",
           ],
         },
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs18.x",
+        "Timeout": 900,
       },
       "Type": "AWS::Lambda::Function",
     },
@@ -803,7 +813,7 @@ Object {
             "Arn",
           ],
         },
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs16.x",
       },
       "Type": "AWS::Lambda::Function",
     },
@@ -874,6 +884,7 @@ Object {
                 "dynamodb:GetItem",
                 "dynamodb:Scan",
                 "dynamodb:ConditionCheckItem",
+                "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
               "Resource": Array [
@@ -951,6 +962,7 @@ Object {
           "Statement": Array [
             Object {
               "Action": Array [
+                "s3:PutBucketPolicy",
                 "s3:GetBucket*",
                 "s3:List*",
                 "s3:DeleteObject*",
@@ -1025,6 +1037,32 @@ Object {
                 },
               ],
             },
+            Object {
+              "Action": "s3:GetObject",
+              "Effect": "Allow",
+              "Principal": Object {
+                "CanonicalUser": Object {
+                  "Fn::GetAtt": Array [
+                    "OriginAccessIdentityDF1E3CAC",
+                    "S3CanonicalUserId",
+                  ],
+                },
+              },
+              "Resource": Object {
+                "Fn::Join": Array [
+                  "",
+                  Array [
+                    Object {
+                      "Fn::GetAtt": Array [
+                        "WebsiteBucket75C24D94",
+                        "Arn",
+                      ],
+                    },
+                    "/*",
+                  ],
+                ],
+              },
+            },
           ],
           "Version": "2012-10-17",
         },
@@ -1053,7 +1091,7 @@ Object {
             "Arn",
           ],
         },
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs16.x",
       },
       "Type": "AWS::Lambda::Function",
     },
@@ -1090,6 +1128,7 @@ Object {
                 "dynamodb:PutItem",
                 "dynamodb:UpdateItem",
                 "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
               "Resource": Array [
